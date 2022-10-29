@@ -27,9 +27,9 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
     }
     public void addFile(FileData f) throws RemoteException {
         UUID id;
-        this.fileList.add(f);
-        id = UUID.nameUUIDFromBytes(f.getFileName().getBytes());
+        id = UUID.fromString(f.getFileName());
         f.setFileID(id);
+        this.fileList.add(f);
         try {
             base64ToFile(f);
         }catch (Exception e) {
@@ -39,7 +39,7 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
     public String getFileID(String fileName) throws RemoteException{
         for(int i = 0; i < this.fileList.size(); ++i) {
             if (fileName.equals((this.fileList.get(i)).getFileName())) {
-                return this.fileList.get(i).getFileName();
+                return this.fileList.get(i).getFileID().toString();
             }
         }
         return null;
