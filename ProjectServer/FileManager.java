@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,7 +26,7 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
     }
     public void addFile(FileData f) throws RemoteException {
         UUID id;
-        id = UUID.fromString(f.getFileName());
+        id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileName()).getBytes()).toString());;
         f.setFileID(id);
         this.fileList.add(f);
         try {

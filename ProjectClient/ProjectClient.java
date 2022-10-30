@@ -21,7 +21,7 @@ public class ProjectClient {
         String base64 = FileToBase64(f);
         String UUID;
         try{
-            l  = (FileListInterface) Naming.lookup("rmi://localhost:2022/filelist");
+            l  = (FileListInterface) Naming.lookup("rmi://localhost:22222/filelist");
             FileData fd = new FileData(null, "Original_Doge_meme.jpg", base64);
             l.addFile(fd);
             UUID = l.getFileID("Original_Doge_meme.jpg");

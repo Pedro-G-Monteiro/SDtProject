@@ -11,7 +11,7 @@ public class ProjectServer {
     public static void main(String[] args) {
 
         try {
-            r = LocateRegistry.createRegistry(2222);
+            r = LocateRegistry.createRegistry(22222);
         } catch (RemoteException a) {
             a.printStackTrace();
         }
