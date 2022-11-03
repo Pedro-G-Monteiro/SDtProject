@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Base64;
+import java.util.UUID;
 
 public class ProjectClient {
 
@@ -17,14 +18,13 @@ public class ProjectClient {
     }
     public static void main(String[] args) {
         FileListInterface l = null;
-        File f = new File("C:\\Users\\IONJi\\Desktop\\Original_Doge_meme.jpg");
+        File f = new File("C:\\Users\\IONJi\\Desktop\\Doggo.jpg");
         String base64 = FileToBase64(f);
-        String UUID;
+        UUID UUID;
         try{
             l  = (FileListInterface) Naming.lookup("rmi://localhost:22222/filelist");
-            FileData fd = new FileData(null, "Original_Doge_meme.jpg", base64);
-            l.addFile(fd);
-            UUID = l.getFileID("Original_Doge_meme.jpg");
+            FileData fd = new FileData(null, "Doggo.jpg", base64);
+            UUID = l.addFile(fd);
             System.out.print("Your File UUID: ");
             System.out.println(UUID);
 
