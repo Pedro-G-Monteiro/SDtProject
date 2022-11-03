@@ -26,7 +26,7 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
     }
     public UUID addFile(FileData f) throws RemoteException {
         UUID id;
-        id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileName()).getBytes()).toString());;
+        id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileBase64()).getBytes()).toString());;
         f.setFileID(id);
         this.fileList.add(f);
         try {
