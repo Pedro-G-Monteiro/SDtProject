@@ -18,10 +18,10 @@ public class ProjectClient {
         }
     }
     public static void main(String[] args) {
-        ArrayList<String> reqList = new ArrayList<String>();
-        FileListInterface l = null;
+        ArrayList<String> reqList;
+        FileListInterface l;
 
-        BalancerReqInterface br = null;
+        BalancerReqInterface br;
         File f = new File("C:\\Users\\Usuario\\Desktop\\Doggo.jpg");
         String base64 = FileToBase64(f);
         UUID UUID;
