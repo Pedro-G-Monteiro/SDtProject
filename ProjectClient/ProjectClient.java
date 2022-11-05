@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -17,16 +18,24 @@ public class ProjectClient {
         }
     }
     public static void main(String[] args) {
-        FileListInterface l = null;
-        File f = new File("C:\\Users\\IONJi\\Desktop\\Doggo.jpg");
+        ArrayList<String> reqList;
+        FileListInterface l;
+
+        BalancerReqInterface br;
+        File f = new File("C:\\Users\\Usuario\\Desktop\\Doggo.jpg");
         String base64 = FileToBase64(f);
         UUID UUID;
         try{
             l  = (FileListInterface) Naming.lookup("rmi://localhost:22222/filelist");
+            br = (BalancerReqInterface) Naming.lookup("rmi://localhost:2022/balancerReq");
             FileData fd = new FileData(null, "Doggo.jpg", base64);
             UUID = l.addFile(fd);
             System.out.print("Your File UUID: ");
             System.out.println(UUID);
+
+            reqList = br.submitRequest(("saveFile " + base64), UUID);
+            System.out.println("Request ID: " + reqList.get(0));
+            System.out.println("Processor ID" + reqList.get(1));
 
         } catch(RemoteException e) {
             System.out.println(e.getMessage());
