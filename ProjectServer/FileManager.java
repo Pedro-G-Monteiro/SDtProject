@@ -7,15 +7,16 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class FileManager extends UnicastRemoteObject implements FileListInterface {
 
-    private ArrayList<FileData> fileList = new ArrayList<FileData>();
+    private HashMap<UUID, String> fileList = new HashMap<>();
     protected FileManager() throws RemoteException{
 
     }
-    public FileManager(ArrayList<FileData> fileList) throws RemoteException{
+    public FileManager(HashMap<UUID, String> fileList) throws RemoteException{
         this.fileList=fileList;
     }
     public void base64ToFile(FileData f) throws IOException {
@@ -28,7 +29,7 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
         UUID id;
         id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileBase64()).getBytes()).toString());;
         f.setFileID(id);
-        this.fileList.add(f);
+        this.fileList.put(f.getFileID(), f.getFileName());
         try {
             base64ToFile(f);
         }catch (Exception e) {
@@ -36,15 +37,10 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
         }
         return id;
     }
-    public String getFileID(String fileName) throws RemoteException{
-        for(int i = 0; i < this.fileList.size(); ++i) {
-            if (fileName.equals((this.fileList.get(i)).getFileName())) {
-                return this.fileList.get(i).getFileID().toString();
-            }
-        }
-        return null;
+    public String getFileName(UUID FileID) throws RemoteException{
+
     }
-    public ArrayList<FileData> fileList() throws RemoteException {
+    public HashMap<UUID, String> fileList() throws RemoteException {
         return fileList;
     }
 }
