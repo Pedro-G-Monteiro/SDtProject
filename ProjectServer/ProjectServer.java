@@ -11,14 +11,14 @@ public class ProjectServer {
     public static void main(String[] args) {
 
         try {
-            r = LocateRegistry.createRegistry(2000);
+            r = LocateRegistry.createRegistry(2003);
         } catch (RemoteException a) {
             a.printStackTrace();
         }
 
         try {
             fileList = new FileManager();
-            r.rebind("filelist", fileList);
+            r.rebind("processor1", fileList);
 
             System.out.println("File server ready");
         } catch (Exception e) {
