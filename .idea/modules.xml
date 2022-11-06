@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SDtProject.iml" filepath="$PROJECT_DIR$/SDtProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Processor2/Processor2.iml" filepath="$PROJECT_DIR$/../Processor2/Processor2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Processor3/Processor3.iml" filepath="$PROJECT_DIR$/../Processor3/Processor3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ProjectBalancer/ProjectBalancer.iml" filepath="$PROJECT_DIR$/../ProjectBalancer/ProjectBalancer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProjectClient/ProjectClient.iml" filepath="$PROJECT_DIR$/ProjectClient/ProjectClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProjectServer/ProjectServer.iml" filepath="$PROJECT_DIR$/ProjectServer/ProjectServer.iml" />
     </modules>
   </component>
 </project>
