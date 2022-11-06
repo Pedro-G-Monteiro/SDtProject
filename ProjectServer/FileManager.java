@@ -38,7 +38,12 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
         return id;
     }
     public String getFileName(UUID FileID) throws RemoteException{
-
+        if(fileList.get(FileID) != null){
+            return fileList.get(FileID);
+        }
+        else{
+            return null;
+        }
     }
     public HashMap<UUID, String> fileList() throws RemoteException {
         return fileList;
