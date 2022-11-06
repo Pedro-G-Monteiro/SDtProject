@@ -23,7 +23,7 @@ public class BalancerReqManager extends UnicastRemoteObject implements BalancerR
         try {
             processCounter++;
             p = (ProcessorListInterface) Naming.lookup(this.procList.get(RRcounter % 3));
-            p.addRequest(script, FileID);
+            p.addRequest(RRcounter % 3, processCounter,script, FileID);
             result.add(String.valueOf(processCounter));
             result.add(String.valueOf(RRcounter));
             RRcounter++;
