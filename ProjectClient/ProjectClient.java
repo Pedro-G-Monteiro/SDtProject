@@ -22,20 +22,20 @@ public class ProjectClient {
         FileListInterface l;
 
         BalancerReqInterface br;
-        File f = new File("C:\\Users\\Usuario\\Desktop\\Doggo.jpg");
+        File f = new File("C:\\Users\\Usuario\\OneDrive\\Ambiente de Trabalho\\Doggo.jpg");
         String base64 = FileToBase64(f);
         UUID UUID;
         try{
-            l  = (FileListInterface) Naming.lookup("rmi://localhost:22222/filelist");
-            br = (BalancerReqInterface) Naming.lookup("rmi://localhost:2022/balancerReq");
+            l  = (FileListInterface) Naming.lookup("rmi://localhost:2000/filelist");
+            //br = (BalancerReqInterface) Naming.lookup("rmi://localhost:2022/balancerReq");
             FileData fd = new FileData(null, "Doggo.jpg", base64);
             UUID = l.addFile(fd);
             System.out.print("Your File UUID: ");
             System.out.println(UUID);
 
-            reqList = br.submitRequest(("saveFile " + base64), UUID);
+            /*reqList = br.submitRequest(("saveFile " + base64), UUID);
             System.out.println("Request ID: " + reqList.get(0));
-            System.out.println("Processor ID" + reqList.get(1));
+            System.out.println("Processor ID" + reqList.get(1));*/
 
         } catch(RemoteException e) {
             System.out.println(e.getMessage());

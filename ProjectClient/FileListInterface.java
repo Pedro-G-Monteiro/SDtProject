@@ -1,13 +1,15 @@
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public interface FileListInterface extends Remote{
+    void base64ToFile(FileData f) throws IOException;
 
-    public UUID addFile(FileData f) throws RemoteException;
+    UUID addFile(FileData f) throws RemoteException;
 
-    public String getFileID(String fileName) throws RemoteException;
+    String getFileName(UUID FileID) throws RemoteException;
 
-    public ArrayList<FileData> fileList() throws RemoteException;
+    HashMap<UUID, String> fileList() throws RemoteException;
 }
