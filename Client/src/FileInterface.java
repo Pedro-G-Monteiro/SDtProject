@@ -8,6 +8,8 @@ public interface FileInterface extends Remote{
 
     String addFile(FileData f) throws RemoteException;
 
+    String getFileBase64(String UUID) throws RemoteException;
+
     String getFileName(String FileID) throws RemoteException;
 
     ArrayList<FileData> fileList() throws RemoteException;

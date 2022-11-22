@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -33,7 +35,7 @@ public class Main {
     }
 
     public static void saveFile() throws IOException{
-        File f = new File("C:\\Users\\Usuario\\OneDrive\\Ambiente de Trabalho\\Projeto\\teste.txt");
+        File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Client\\teste.txt");
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "teste.txt", base64);
         String UUID = fi.addFile(fd);
@@ -67,11 +69,11 @@ public class Main {
         String filepath, id;
         System.out.println("ID do ficheiro a enviar para o processador:");
         id = getOption.next();
-        System.out.println("URL do Script:");
+        System.out.println("Caminho do Script:");
         getOption.nextLine();
         filepath = getOption.next();
-        ArrayList<String> result = bi.SendRequest(filepath, id);
-
+        String b64 = FilePathToBase64(Paths.get(filepath));
+        ArrayList<String> result = bi.SendRequest(b64, id);
         System.out.println("ID do pedido: "+ result.get(0));
         System.out.println("ID do processador: " + result.get(1));
     }
@@ -107,6 +109,14 @@ public class Main {
             return Base64.getEncoder().encodeToString(fileContent);
         } catch (IOException e) {
             throw new IllegalStateException("could not read file " + file, e);
+        }
+    }
+    public static String FilePathToBase64(Path path){
+        try {
+            byte[] fileContent = Files.readAllBytes(path);
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (IOException e) {
+            throw new IllegalStateException("could not read file " + e);
         }
     }
 

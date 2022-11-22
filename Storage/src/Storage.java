@@ -21,7 +21,7 @@ public class Storage extends UnicastRemoteObject implements FileInterface {
     }
     public void base64ToFile(FileData f) throws IOException {
         byte[] decodedImg = Base64.getDecoder().decode(f.getFileBase64().getBytes(StandardCharsets.UTF_8));
-        Path destinationFile = Paths.get("C:\\Users\\Usuario\\OneDrive\\Ambiente de Trabalho\\Projeto\\Storage\\savedFiles", f.getFileName());
+        Path destinationFile = Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Storage\\savedFiles", f.getFileName());
         Files.write(destinationFile, decodedImg);
     }
 
@@ -36,6 +36,14 @@ public class Storage extends UnicastRemoteObject implements FileInterface {
             System.out.println("base64ToFile Error: " + e.getMessage());
         }
         return f.getFileID();
+    }
+    public String getFileBase64(String FileID) throws RemoteException{
+        for (FileData fileData : fileList) {
+            if (FileID.equals(fileData.getFileID())) {
+                return fileData.getFileBase64();
+            }
+        }
+        return null;
     }
 
     public String getFileName(String FileID) throws RemoteException{

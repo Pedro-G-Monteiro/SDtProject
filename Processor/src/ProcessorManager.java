@@ -3,6 +3,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -37,13 +41,20 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         System.out.println(script);
 
         try {
-            Process runtimeProcess = Runtime.getRuntime().exec("C:\\Users\\alexa\\OneDrive\\Ambiente de Trabalho\\Projeto\\Storage\\savedFiles\\script.bat");
+            base64ToFile(script);
+            String b64 = fi.getFileBase64(IDFile);
+            FileToBase64(new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\infile.txt"));
+            Process runtimeProcess = Runtime.getRuntime().exec("D:/Uni/3º Ano/1º Semestre/Sistemas Distribuídos//Trabalho Prático/Sprint 4/Processor/temp/script.bat",
+                    null,
+                    new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp"));
+            runtimeProcess.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(runtimeProcess.getInputStream()));
             StringBuilder output = new StringBuilder();
 
             String line;
             while((line = reader.readLine()) != null){
                 output.append(line).append(System.getProperty("line.separator"));
+                System.out.println(line);
             }
             runtimeProcess.waitFor();
             reader.close();
@@ -67,7 +78,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     public static void saveFile() throws IOException{
-        File f = new File("C:\\Users\\alexa\\OneDrive\\Ambiente de Trabalho\\Projeto\\Storage\\savedFiles\\output.txt");
+        File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\outfile.txt");
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "output.txt", base64);
         String UUID = fi.addFile(fd);
@@ -77,6 +88,11 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     public int getEstado() throws RemoteException {
         return 1;
+    }
+    public void base64ToFile(String s) throws IOException {
+        byte[] decodedImg = Base64.getDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
+        Path destinationFile = Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp", "script.bat");
+        java.nio.file.Files.write(destinationFile, decodedImg);
     }
 
 }
