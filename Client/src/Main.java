@@ -97,8 +97,11 @@ public class Main {
         System.out.println("ID do pedido: "+ result.get(0));
         System.out.println("ID do processador: " + result.get(1));
     }
-    public static void createFiveRequests() throws IOException{
-        for(int i = 0; i<50; i++) {
+    public static void createNRequests() throws IOException{
+        Integer n;
+        System.out.println("Quantidade de pedidos a fazer:");
+        n = Integer.valueOf(getOption.next());
+        for(int i = 0; i<n; i++) {
             String id = testUUID;
             String b64 = FilePathToBase64(Paths.get("C:\\Users\\IONJi\\Desktop\\script.bat"));
             ArrayList<String> result = bi.SendRequest(b64, id);
@@ -124,7 +127,7 @@ public class Main {
             System.out.println("| [2] Enviar um identificador e receber um ficheiro     |");
             System.out.println("| [3] Enviar um pedido de execução para um processador  |");
             System.out.println("| [4] Saber o estado do pedido                          |");
-            System.out.println("| [5] Enviar cinquenta (50) requests                    |");
+            System.out.println("| [5] Enviar N requests                                 |");
             System.out.println("| [6] Recebe estados dos processadores                  |");
             System.out.println("| [0] Sair                                              |");
             System.out.println("+-------------------------------------------------------+");
@@ -134,7 +137,7 @@ public class Main {
                 case "2" -> getFile(); //Storage -> SPRINT 1
                 case "3" -> CreateRequest(); //Balancer -> SPRINT 2
                 case "4" -> getEstado(); //Processador -> SPRINT 2
-                case "5" -> createFiveRequests();
+                case "5" -> createNRequests();
                 case "6" -> getProcessStatus();
                 case "0" -> {
                     return;

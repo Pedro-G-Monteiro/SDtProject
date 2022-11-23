@@ -24,6 +24,10 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     static FileInterface fi;
     private int procId;
     private int procPort;
+    private String folderPath;
+    private String infilePath;
+    private String outfilePath;
+    private String scriptPath;
 
     private Queue<String> procQueue = new LinkedList();
 
@@ -38,6 +42,10 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     protected ProcessorManager(int processId, int port) throws RemoteException{
         procId = processId;
         procPort = port;
+        folderPath = "D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp"+procPort;
+        infilePath = folderPath+"\\infile.txt";
+        outfilePath = folderPath+"\\outfile.txt";
+        scriptPath = folderPath+"\\script.bat";
         Thread multicastThread = new Thread(new Runnable() {
             public void run() {
                 try { sendHeartbeats(procPort); } catch (Exception ignored) {}}
@@ -58,7 +66,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
     private void procRequest() throws IOException, InterruptedException{
-        System.out.println("["+procId+"]Thread started");
+        System.out.println("["+procId+"]Listening for Process'");
         while(true){
             if(procQueue.iterator().hasNext()) {
                 System.out.println("-------------------["+procId+"]Starting process-------------------");
@@ -73,10 +81,10 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                     base64ToFile(script, "script");
                     String b64 = fi.getFileBase64(IDFile);
                     base64ToFile(b64, "infile");
-                    FileToBase64(new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\infile.txt"));
-                    Process runtimeProcess = Runtime.getRuntime().exec("D:/Uni/3º Ano/1º Semestre/Sistemas Distribuídos//Trabalho Prático/Sprint 4/Processor/temp/script.bat",
+                    FileToBase64(new File(infilePath));
+                    Process runtimeProcess = Runtime.getRuntime().exec(scriptPath,
                             null,
-                            new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp"));
+                            new File(folderPath));
                     runtimeProcess.waitFor();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(runtimeProcess.getInputStream()));
                     StringBuilder output = new StringBuilder();
@@ -92,19 +100,21 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                     System.out.println("["+procId+"]Script executado!");
 
                     saveFile(); //SUBMIT OUTPUT
-                    deleteFile(new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\infile.txt"));
-                    deleteFile(new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\outfile.txt"));
-                    deleteFile(new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\script.bat"));
+                    deleteFile(new File(infilePath));
+                    deleteFile(new File(outfilePath));
+                    deleteFile(new File(scriptPath));
 
 
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-            else{
-                //System.out.println(procQueue.size);
-            }
-            Thread.sleep(1000);
+            int wait;
+            if(procPort == 2002)
+                wait = 100;
+            else
+                wait = 200;
+            Thread.sleep(wait);
         }
     }
 
@@ -126,8 +136,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
 
-    public static void saveFile() throws IOException{
-        File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp\\outfile.txt");
+    public void saveFile() throws IOException{
+        File f = new File(outfilePath);
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "output.txt", base64);
         String UUID = fi.addFile(fd);
@@ -142,9 +152,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         byte[] decodedImg = Base64.getDecoder().decode(s.getBytes(StandardCharsets.UTF_8));
         Path destinationFile;
         if(type == "script")
-            destinationFile = Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp", "script.bat");
+            destinationFile = Paths.get(folderPath, "script.bat");
         else
-            destinationFile = Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp", "infile.txt");
+            destinationFile = Paths.get(folderPath, "infile.txt");
         java.nio.file.Files.write(destinationFile, decodedImg);
     }
     public void sendHeartbeats(int port) throws IOException, InterruptedException{
