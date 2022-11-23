@@ -7,28 +7,33 @@ import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Scanner;
+import java.util.*;
 
 /*
 * Ports:
 * 2000 -> Storage
 * 2001 -> Balancer
-* 2002 -> Processor
+* 2002 -> Processor 1
+* 2003 -> Processor 2
+* 2004 -> Processor 3
+* 2005 -> Processor 4
 * */
 
 public class Main {
     static Scanner getOption = new Scanner(System.in);
     static FileInterface fi;
     static BalancerInterface bi;
-    static ProcessorInterface pi;
+    static ProcessorInterface pi1;
+    static ProcessorInterface pi2;
+
+    static String testUUID;
 
     static {
         try {
             fi = (FileInterface) Naming.lookup("rmi://localhost:2000/Storage");
             bi = (BalancerInterface) Naming.lookup("rmi://localhost:2001/Balancer");
-            pi = (ProcessorInterface) Naming.lookup("rmi://localhost:2002/Processor");
+            pi1 = (ProcessorInterface) Naming.lookup("rmi://localhost:2002/Processor");
+            pi2 = (ProcessorInterface) Naming.lookup("rmi://localhost:2003/Processor");
         } catch (NotBoundException | RemoteException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -39,6 +44,7 @@ public class Main {
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "teste.txt", base64);
         String UUID = fi.addFile(fd);
+        testUUID = UUID;
         System.out.println("Ficheiro guardado!");
         System.out.println(UUID);
     }
@@ -53,14 +59,28 @@ public class Main {
     }
 
     public static void getEstado() throws RemoteException {
-        int estado = 0;
-        estado = pi.getEstado();
-        if(estado==0)
+        int estado1 = 0;
+        int estado2 = 0;
+        estado1 = pi1.getEstado();
+        estado2 = pi2.getEstado();
+        if(estado1==0)
         {
+            System.out.println("--Processor 1--");
             System.out.println("Não Enviado");
         }
-        else if (estado==1)
+        else if (estado1==1)
         {
+            System.out.println("--Processor 1--");
+            System.out.println("Ficheiro no processador.");
+        }
+        if(estado2==0)
+        {
+            System.out.println("--Processor 2--");
+            System.out.println("Não Enviado");
+        }
+        else if (estado2==1)
+        {
+            System.out.println("--Processor 2--");
             System.out.println("Ficheiro no processador.");
         }
     }
@@ -77,6 +97,22 @@ public class Main {
         System.out.println("ID do pedido: "+ result.get(0));
         System.out.println("ID do processador: " + result.get(1));
     }
+    public static void createFiveRequests() throws IOException{
+        for(int i = 0; i<50; i++) {
+            String id = testUUID;
+            String b64 = FilePathToBase64(Paths.get("C:\\Users\\IONJi\\Desktop\\script.bat"));
+            ArrayList<String> result = bi.SendRequest(b64, id);
+            System.out.println("ID do pedido: "+ result.get(0));
+            System.out.println("ID do processador: " + result.get(1));
+        }
+    }
+    public static void getProcessStatus() throws RemoteException{
+        HashMap<String, String> status = bi.getProcessStates();
+        for (Map.Entry<String, String> entry : status.entrySet()) {
+            System.out.println("Processor:\t" + entry.getKey());
+            System.out.println("Queue:\t\t" + entry.getValue());
+        }
+    }
     public static void Menu() throws IOException {
         String opcao;
         while(true)
@@ -88,6 +124,8 @@ public class Main {
             System.out.println("| [2] Enviar um identificador e receber um ficheiro     |");
             System.out.println("| [3] Enviar um pedido de execução para um processador  |");
             System.out.println("| [4] Saber o estado do pedido                          |");
+            System.out.println("| [5] Enviar cinquenta (50) requests                    |");
+            System.out.println("| [6] Recebe estados dos processadores                  |");
             System.out.println("| [0] Sair                                              |");
             System.out.println("+-------------------------------------------------------+");
             opcao = getOption.next();
@@ -96,6 +134,8 @@ public class Main {
                 case "2" -> getFile(); //Storage -> SPRINT 1
                 case "3" -> CreateRequest(); //Balancer -> SPRINT 2
                 case "4" -> getEstado(); //Processador -> SPRINT 2
+                case "5" -> createFiveRequests();
+                case "6" -> getProcessStatus();
                 case "0" -> {
                     return;
                 }

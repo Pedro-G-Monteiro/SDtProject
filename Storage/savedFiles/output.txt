@@ -1,16 +1,10 @@
-Fuck's Given = 0
-Fuck's Given = 
-Fuck's Given =
-Fuck's Given 
-Fuck's Given
-Fuck's Give
-Fuck's Giv
-Fuck's Gi
-Fuck's G
-Fuck's 
-Fuck's
-Fuck'
-Fuck
-Fuc
-Fu
-F
+linha 10
+linha 9
+linha 8
+linha 7
+linha 6
+linha 5
+linha 4
+linha 3
+linha 2
+linha 1
