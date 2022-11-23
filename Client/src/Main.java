@@ -103,7 +103,7 @@ public class Main {
         n = Integer.valueOf(getOption.next());
         for(int i = 0; i<n; i++) {
             String id = testUUID;
-            String b64 = FilePathToBase64(Paths.get("C:\\Users\\IONJi\\Desktop\\script.bat"));
+            String b64 = FilePathToBase64(Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Client\\script.bat"));
             ArrayList<String> result = bi.SendRequest(b64, id);
             System.out.println("ID do pedido: "+ result.get(0));
             System.out.println("ID do processador: " + result.get(1));
