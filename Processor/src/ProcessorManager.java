@@ -21,7 +21,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     HashMap<String, String> Files = new HashMap<>();
 
-    static FileInterface fi;
+    static StorageInterface si;
     private int procId;
     private int procPort;
     private String folderPath;
@@ -33,7 +33,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     static {
         try {
-            fi = (FileInterface) Naming.lookup("rmi://localhost:2000/Storage");
+            si = (StorageInterface) Naming.lookup("rmi://localhost:2000/Storage");
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -79,7 +79,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
                 try {
                     base64ToFile(script, "script");
-                    String b64 = fi.getFileBase64(IDFile);
+                    String b64 = si.getFileBase64(IDFile);
                     base64ToFile(b64, "infile");
                     FileToBase64(new File(infilePath));
                     Process runtimeProcess = Runtime.getRuntime().exec(scriptPath,
@@ -140,7 +140,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         File f = new File(outfilePath);
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "output.txt", base64);
-        String UUID = fi.addFile(fd);
+        String UUID = si.addFile(fd);
         System.out.println("Ficheiro guardado!");
         System.out.println(UUID);
     }

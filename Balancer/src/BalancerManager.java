@@ -33,14 +33,12 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         }
         counter ++;
         if(counter%2 == 0){
-            System.out.println("PASSEI NO 1");
             pi1.sendRequest(script, IDFile);
             result.add(Integer.toString(counter));
             result.add(String.valueOf(counter%2+1));
             return result;
         }
         else{
-            System.out.println("PASSEI NO 2");
             pi2.sendRequest(script, IDFile);
             result.add(Integer.toString(counter));
             result.add(String.valueOf(counter%2+1));

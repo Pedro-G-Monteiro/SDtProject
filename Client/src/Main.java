@@ -21,7 +21,7 @@ import java.util.*;
 
 public class Main {
     static Scanner getOption = new Scanner(System.in);
-    static FileInterface fi;
+    static StorageInterface si;
     static BalancerInterface bi;
     static ProcessorInterface pi1;
     static ProcessorInterface pi2;
@@ -30,7 +30,7 @@ public class Main {
 
     static {
         try {
-            fi = (FileInterface) Naming.lookup("rmi://localhost:2000/Storage");
+            si = (StorageInterface) Naming.lookup("rmi://localhost:2000/Storage");
             bi = (BalancerInterface) Naming.lookup("rmi://localhost:2001/Balancer");
             pi1 = (ProcessorInterface) Naming.lookup("rmi://localhost:2002/Processor");
             pi2 = (ProcessorInterface) Naming.lookup("rmi://localhost:2003/Processor");
@@ -43,7 +43,7 @@ public class Main {
         File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Client\\teste.txt");
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "teste.txt", base64);
-        String UUID = fi.addFile(fd);
+        String UUID = si.addFile(fd);
         testUUID = UUID;
         System.out.println("Ficheiro guardado!");
         System.out.println(UUID);
@@ -54,7 +54,7 @@ public class Main {
         String IDFile;
         System.out.println("ID do ficheiro:");
         IDFile = getOption.next();
-        String fileName = fi.getFileName(IDFile);
+        String fileName = si.getFileName(IDFile);
         System.out.println("O nome do ficheiro é: "+ fileName);
     }
 

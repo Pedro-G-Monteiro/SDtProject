@@ -1,4 +1,3 @@
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.UUID;
 
-public class Storage extends UnicastRemoteObject implements FileInterface {
+public class StorageManager extends UnicastRemoteObject implements StorageInterface {
 
     private ArrayList<FileData> fileList = new ArrayList<>();
-    protected Storage() throws RemoteException{
+    protected StorageManager() throws RemoteException{
 
     }
-    public Storage(ArrayList<FileData> fileList) throws RemoteException{
+    public StorageManager(ArrayList<FileData> fileList) throws RemoteException{
         this.fileList=fileList;
     }
     public void base64ToFile(FileData f) throws IOException {

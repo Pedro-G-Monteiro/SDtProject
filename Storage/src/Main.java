@@ -4,7 +4,7 @@ import java.rmi.registry.Registry;
 
 public class Main {
     public static Registry r=null;
-    public static Storage Storage;
+    public static StorageManager Storage;
     public static void main(String[] args) {
 
         try {
@@ -14,7 +14,7 @@ public class Main {
         }
 
         try {
-            Storage = new Storage();
+            Storage = new StorageManager();
             r.rebind("Storage", Storage);
 
             System.out.println("Storage service ready");
