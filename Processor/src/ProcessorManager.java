@@ -29,6 +29,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     private String outfilePath;
     private String scriptPath;
 
+    private boolean setup = true;
     private Queue<String> procQueue = new LinkedList();
 
     static {
@@ -158,10 +159,16 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         java.nio.file.Files.write(destinationFile, decodedImg);
     }
     public void sendHeartbeats(int port) throws IOException, InterruptedException{
+        String type;
         while(true){
-            String mensagem = "rmi://localhost:"+procPort+"/Processor,"+procQueue.size();
+            type = "update";
+            if(setup){
+                type = "setup";
+                setup = false;
+            }
+            String mensagem = type + ",rmi://localhost:"+procPort+"/Processor,"+procQueue.size();
             sendMulticast(4446, mensagem);
-            Thread.sleep(8000);
+            Thread.sleep(8000); //30000 -> 30 segundos
         }
     }
     public void sendMulticast(int port, String msg) throws IOException, InterruptedException{

@@ -57,16 +57,19 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             socket1.receive(packet1);
             String msg1 = new String(packet1.getData(), 0, packet1.getLength()); //mensagem recebida
             List<String> qList = Arrays.asList(msg1.split(","));
-            String processor = qList.get(0);
-            String queue = qList.get(1);
-            if(processorState.containsKey(processor)){
-                processorState.replace(processor, queue);
+            String type = qList.get(0);
+            String processor = qList.get(1);
+            String queue = qList.get(2);
+            if(type.equals("update")){
+                if(processorState.containsKey(processor)){
+                    processorState.replace(processor, queue);
+                }
+                else
+                    processorState.putIfAbsent(processor, queue);
+                System.out.println("Processor:\t"+processor);
+                System.out.println("Queue:\t\t"+queue);
+                System.out.println("------------------------------------------------------");
             }
-            else
-                processorState.putIfAbsent(processor, queue);
-            System.out.println("Processor:\t"+processor);
-            System.out.println("Queue:\t\t"+queue);
-            System.out.println("------------------------------------------------------");
         }
     }
     public HashMap<String, String> getProcessStates() throws RemoteException{
