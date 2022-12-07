@@ -49,7 +49,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         scriptPath = folderPath+"\\script.bat";
         Thread multicastThread = new Thread(new Runnable() {
             public void run() {
-                try { sendHeartbeats(procPort); } catch (Exception ignored) {}}
+                try { sendHeartbeats(); } catch (Exception ignored) {}}
         });
         Thread processThread = new Thread(new Runnable() {
             public void run() {
@@ -70,13 +70,13 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         System.out.println("["+procId+"]Listening for Process'");
         while(true){
             if(procQueue.iterator().hasNext()) {
-                System.out.println("-------------------["+procId+"]Starting process-------------------");
+                //System.out.println("-------------------["+procId+"]Starting process-------------------");
                 String qItem = procQueue.remove();
                 List<String> qList = Arrays.asList(qItem.split(","));
                 String script = qList.get(0);
                 String IDFile = qList.get(1);
                 Files.put(IDFile, script);
-                System.out.println(script);
+                //System.out.println(script);
 
                 try {
                     base64ToFile(script, "script");
@@ -93,12 +93,12 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                     String line;
                     while((line = reader.readLine()) != null){
                         output.append(line).append(System.getProperty("line.separator"));
-                        System.out.println(line);
+                        //System.out.println(line);
                     }
                     runtimeProcess.waitFor();
                     reader.close();
 
-                    System.out.println("["+procId+"]Script executado!");
+                    //System.out.println("["+procId+"]Script executado!");
 
                     saveFile(); //SUBMIT OUTPUT
                     deleteFile(new File(infilePath));
@@ -122,7 +122,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     public void deleteFile(File f){
         try{
             f.delete();
-            System.out.println("Ficheiro apagado!");
+            //System.out.println("Ficheiro apagado!");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -142,8 +142,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "output.txt", base64);
         String UUID = si.addFile(fd);
-        System.out.println("Ficheiro guardado!");
-        System.out.println(UUID);
+        //System.out.println("Ficheiro guardado!");
+        //System.out.println(UUID);
     }
 
     public int getEstado() throws RemoteException {
@@ -158,7 +158,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             destinationFile = Paths.get(folderPath, "infile.txt");
         java.nio.file.Files.write(destinationFile, decodedImg);
     }
-    public void sendHeartbeats(int port) throws IOException, InterruptedException{
+    public void sendHeartbeats() throws IOException, InterruptedException{
         String type;
         while(true){
             type = "update";

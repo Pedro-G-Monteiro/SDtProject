@@ -9,6 +9,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
+import static java.lang.Integer.parseInt;
+
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
 
     static HashMap<String, String> processorState = new HashMap<>();
@@ -31,17 +33,19 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         } catch (NotBoundException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
-        counter ++;
-        if(counter%2 == 0){
+        int load1 = parseInt(processorState.get("rmi://localhost:2002/Processor"));
+        int load2 = parseInt(processorState.get("rmi://localhost:2003/Processor"));
+        counter++;
+        if(load1<load2){
             pi1.sendRequest(script, IDFile);
             result.add(Integer.toString(counter));
-            result.add(String.valueOf(counter%2+1));
+            result.add("1");
             return result;
         }
         else{
             pi2.sendRequest(script, IDFile);
             result.add(Integer.toString(counter));
-            result.add(String.valueOf(counter%2+1));
+            result.add("2");
             return result;
         }
     }
@@ -64,8 +68,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 if(processorState.containsKey(processor)){
                     processorState.replace(processor, queue);
                 }
-                else
-                    processorState.putIfAbsent(processor, queue);
                 System.out.println("Processor:\t"+processor);
                 System.out.println("Queue:\t\t"+queue);
                 System.out.println("------------------------------------------------------");
@@ -74,5 +76,11 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     }
     public HashMap<String, String> getProcessStates() throws RemoteException{
         return processorState;
+    }
+    public void addProcessor(String processor, String queue) throws RemoteException{
+        processorState.putIfAbsent(processor, queue);
+    }
+    public void removeProcessor(String processor) throws RemoteException{
+        processorState.remove(processor);
     }
 }
