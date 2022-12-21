@@ -14,12 +14,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.nio.file.Files.readAllBytes;
 
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface{
 
-    HashMap<String, String> Files = new HashMap<>();
+    ConcurrentHashMap<String, String> Files = new ConcurrentHashMap<>();
+    static boolean stopOrder = false;
 
     static StorageInterface si;
     private int procId;
@@ -30,7 +33,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     private String scriptPath;
 
     private boolean setup = true;
-    private Queue<String> procQueue = new LinkedList();
+    static volatile int taskId = 0;
+    private ConcurrentLinkedQueue<String> procQueue = new ConcurrentLinkedQueue();
 
     static {
         try {
@@ -43,7 +47,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     protected ProcessorManager(int processId, int port) throws RemoteException{
         procId = processId;
         procPort = port;
-        folderPath = "D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Processor\\temp"+procPort;
+        folderPath = "D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 5\\Processor\\temp"+procPort;
         infilePath = folderPath+"\\infile.txt";
         outfilePath = folderPath+"\\outfile.txt";
         scriptPath = folderPath+"\\script.bat";
@@ -59,11 +63,13 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         processThread.start();
     }
 
-    public void sendRequest(String script, String IDFile) throws RemoteException {
+    public void sendRequest(String script, String IDFile) throws IOException, InterruptedException {
         if(script==null || IDFile == null)
             return;
         else{
-            procQueue.add(script+","+IDFile);
+            procQueue.add(taskId+","+script+","+IDFile);
+            sendMulticast(4448, "0,"+taskId+",rmi://localhost:"+procPort+"/Processor,"+script+","+IDFile);
+            taskId++;
         }
     }
     private void procRequest() throws IOException, InterruptedException{
@@ -73,9 +79,11 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 //System.out.println("-------------------["+procId+"]Starting process-------------------");
                 String qItem = procQueue.remove();
                 List<String> qList = Arrays.asList(qItem.split(","));
-                String script = qList.get(0);
-                String IDFile = qList.get(1);
+                String id = qList.get(0);
+                String script = qList.get(1);
+                String IDFile = qList.get(2);
                 Files.put(IDFile, script);
+                sendMulticast(4448, "1,"+id+",rmi://localhost:"+procPort+"/Processor");
                 //System.out.println(script);
 
                 try {
@@ -105,16 +113,17 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                     deleteFile(new File(outfilePath));
                     deleteFile(new File(scriptPath));
 
-
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
             int wait;
             if(procPort == 2002)
-                wait = 100;
+                wait = 1000;
             else
-                wait = 200;
+                wait = 2000;
+            if(stopOrder)
+                Thread.currentThread().interrupt();
             Thread.sleep(wait);
         }
     }
@@ -160,6 +169,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
     public void sendHeartbeats() throws IOException, InterruptedException{
         String type;
+        int incrTimer = 0;
         while(true){
             type = "update";
             if(setup){
@@ -167,11 +177,20 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 setup = false;
             }
             String mensagem = type + ",rmi://localhost:"+procPort+"/Processor,"+procQueue.size();
-            sendMulticast(4446, mensagem);
-            Thread.sleep(8000); //30000 -> 30 segundos
+            sendMulticast(4446, mensagem); //Balancer
+            sendMulticast(4447,mensagem); //Coordinator
+            if(procPort == 2003)
+                Thread.sleep(8000+incrTimer);
+            else
+                Thread.sleep(8000);
+            if(incrTimer>50000 && procPort == 2003)
+                Thread.currentThread().interrupt();
+            incrTimer = incrTimer+ 16_000;
+            if(stopOrder)
+                Thread.currentThread().interrupt();
         }
     }
-    public void sendMulticast(int port, String msg) throws IOException, InterruptedException{
+    public synchronized void sendMulticast(int port, String msg) throws IOException, InterruptedException{
         DatagramSocket socket = new DatagramSocket();
         InetAddress group = InetAddress.getByName("230.0.0.0");
         byte[] buffer = msg.getBytes();
@@ -179,5 +198,4 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         socket.send(packet);
         socket.close();
     }
-
 }

@@ -8,6 +8,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
 * Ports:
@@ -40,7 +41,7 @@ public class Main {
     }
 
     public static void saveFile() throws IOException{
-        File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Client\\teste.txt");
+        File f = new File("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 5\\Client\\teste.txt");
         String base64 = FileToBase64(f);
         FileData fd = new FileData(null, "teste.txt", base64);
         String UUID = si.addFile(fd);
@@ -103,14 +104,14 @@ public class Main {
         n = Integer.valueOf(getOption.next());
         for(int i = 0; i<n; i++) {
             String id = testUUID;
-            String b64 = FilePathToBase64(Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 4\\Client\\script.bat"));
+            String b64 = FilePathToBase64(Paths.get("D:\\Uni\\3º Ano\\1º Semestre\\Sistemas Distribuídos\\Trabalho Prático\\Sprint 5\\Client\\script.bat"));
             ArrayList<String> result = bi.SendRequest(b64, id);
             System.out.println("ID do pedido: "+ result.get(0));
             System.out.println("ID do processador: " + result.get(1));
         }
     }
     public static void getProcessStatus() throws RemoteException{
-        HashMap<String, String> status = bi.getProcessStates();
+        ConcurrentHashMap<String, String> status = bi.getProcessStates();
         for (Map.Entry<String, String> entry : status.entrySet()) {
             System.out.println("Processor:\t" + entry.getKey());
             System.out.println("Queue:\t\t" + entry.getValue());

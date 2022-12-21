@@ -8,12 +8,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Integer.parseInt;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
 
-    static HashMap<String, String> processorState = new HashMap<>();
+    static ConcurrentHashMap<String, String> processorState = new ConcurrentHashMap<>();
+    static boolean stopOrder = false;
     protected BalancerManager() throws RemoteException {
         Thread multicastThread = new Thread(new Runnable() {
             public void run() {
@@ -23,7 +25,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     }
     static int counter = 0;
 
-    public ArrayList<String> SendRequest(String script, String IDFile) throws RemoteException{
+    public ArrayList<String> SendRequest(String script, String IDFile) throws IOException, InterruptedException {
         ProcessorInterface pi1;
         ProcessorInterface pi2;
         ArrayList<String> result = new ArrayList<>();
@@ -72,9 +74,11 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 System.out.println("Queue:\t\t"+queue);
                 System.out.println("------------------------------------------------------");
             }
+            if(stopOrder)
+                Thread.currentThread().interrupt();
         }
     }
-    public HashMap<String, String> getProcessStates() throws RemoteException{
+    public ConcurrentHashMap<String, String> getProcessStates() throws RemoteException{
         return processorState;
     }
     public void addProcessor(String processor, String queue) throws RemoteException{
@@ -82,5 +86,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     }
     public void removeProcessor(String processor) throws RemoteException{
         processorState.remove(processor);
+        System.out.println("Removed processor "+processor);
     }
 }
