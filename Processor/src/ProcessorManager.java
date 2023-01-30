@@ -23,6 +23,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     ConcurrentHashMap<String, String> Files = new ConcurrentHashMap<>();
     static boolean stopOrder = false;
+    public Lock lk = new Lock();
 
     static StorageInterface si;
     private int procId;
@@ -67,14 +68,17 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         if(script==null || IDFile == null)
             return;
         else{
+            lk.lock();
             procQueue.add(taskId+","+script+","+IDFile);
             sendMulticast(4448, "0,"+taskId+",rmi://localhost:"+procPort+"/Processor,"+script+","+IDFile);
             taskId++;
+            lk.unlock();
         }
     }
     private void procRequest() throws IOException, InterruptedException{
         System.out.println("["+procId+"]Listening for Process'");
         while(true){
+            lk.lock();
             if(procQueue.iterator().hasNext()) {
                 //System.out.println("-------------------["+procId+"]Starting process-------------------");
                 String qItem = procQueue.remove();
@@ -117,6 +121,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                     throw new RuntimeException(e);
                 }
             }
+            lk.unlock();
             int wait;
             if(procPort == 2002)
                 wait = 1000;
@@ -176,7 +181,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 type = "setup";
                 setup = false;
             }
+            lk.lock();
             String mensagem = type + ",rmi://localhost:"+procPort+"/Processor,"+procQueue.size();
+            lk.unlock();
             sendMulticast(4446, mensagem); //Balancer
             sendMulticast(4447,mensagem); //Coordinator
             if(procPort == 2003)

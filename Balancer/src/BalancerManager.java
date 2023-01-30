@@ -16,6 +16,8 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
 
     static ConcurrentHashMap<String, String> processorState = new ConcurrentHashMap<>();
     static boolean stopOrder = false;
+    public Lock lk = new Lock();
+
     protected BalancerManager() throws RemoteException {
         Thread multicastThread = new Thread(new Runnable() {
             public void run() {
@@ -35,9 +37,11 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         } catch (NotBoundException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
+        lk.lock();
         int load1 = parseInt(processorState.get("rmi://localhost:2002/Processor"));
         int load2 = parseInt(processorState.get("rmi://localhost:2003/Processor"));
         counter++;
+        lk.unlock();
         if(load1<load2){
             pi1.sendRequest(script, IDFile);
             result.add(Integer.toString(counter));
@@ -51,7 +55,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             return result;
         }
     }
-    private void MulticastReceiver(int port) throws IOException {
+    private void MulticastReceiver(int port) throws IOException, InterruptedException {
         MulticastSocket socket1 = null;
         byte[] buffer = new byte[256];
         socket1 = new MulticastSocket(port);
@@ -66,6 +70,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             String type = qList.get(0);
             String processor = qList.get(1);
             String queue = qList.get(2);
+            lk.lock();
             if(type.equals("update")){
                 if(processorState.containsKey(processor)){
                     processorState.replace(processor, queue);
@@ -74,6 +79,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 System.out.println("Queue:\t\t"+queue);
                 System.out.println("------------------------------------------------------");
             }
+            lk.unlock();
             if(stopOrder)
                 Thread.currentThread().interrupt();
         }
@@ -81,11 +87,15 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     public ConcurrentHashMap<String, String> getProcessStates() throws RemoteException{
         return processorState;
     }
-    public void addProcessor(String processor, String queue) throws RemoteException{
+    public void addProcessor(String processor, String queue) throws RemoteException, InterruptedException {
+        lk.lock();
         processorState.putIfAbsent(processor, queue);
+        lk.unlock();
     }
-    public void removeProcessor(String processor) throws RemoteException{
+    public void removeProcessor(String processor) throws RemoteException, InterruptedException {
+        lk.lock();
         processorState.remove(processor);
         System.out.println("Removed processor "+processor);
+        lk.unlock();
     }
 }
