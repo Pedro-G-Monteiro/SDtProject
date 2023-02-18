@@ -24,3 +24,8 @@ Alexandre Valejo Moreira - 20223 - pv20223@alunos.estgv.ipv.pt
 
 [Java.js]: https://img.shields.io/badge/Java-007396?style=flat-square&logo=Java&logoColor=white
 [Java-url]: https://java.com/
+[Carlos_GitHub.js]: https://img.shields.io/badge/Carlos-100000?style=plastic&logo=github&logoColor=white
+[Alexandre_GitHub.js]: https://img.shields.io/badge/Alexandre-100000?style=plastic&logo=github&logoColor=white
+[Carlos_GitHub-url]: https://github.com/ArturSantos23
+[Alexandre_GitHub-url]: https://github.com/a21966
+
